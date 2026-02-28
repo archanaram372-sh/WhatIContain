@@ -26,7 +26,18 @@ def analyze():
     file.save(filepath)
 
     # OCR
-    raw_text = pytesseract.image_to_string(Image.open(filepath))
+    try:
+        raw_text = pytesseract.image_to_string(Image.open(filepath))
+    except Exception as e:
+        os.remove(filepath)
+        return jsonify({"error": str(e)}), 500
+
+    # after creating unique_ingredients
+    os.remove(filepath)
+
+    return jsonify({
+    "ingredients_list": unique_ingredients
+})
 
     # 1️⃣ Normalize text
     text = raw_text.replace("\n", " ")
@@ -66,4 +77,4 @@ def analyze():
         "ingredients_list": unique_ingredients
     })
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
