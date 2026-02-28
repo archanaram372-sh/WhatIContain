@@ -1,32 +1,30 @@
+import os
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from PIL import Image
-import pytesseract
-import os
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai 
+from google.genai import types
 
-# ----------------- CONFIG -----------------
-load_dotenv()  # Load .env file
-GEMINI_KEY = os.getenv("GEMINI_KEY")  # Your Gemini API key
+# 1. Setup & Config
+load_dotenv()
+GEMINI_KEY = os.getenv("GEMINI_KEY")
 
-genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Initialize the new Client based on your reference
+# In app.py
+client = genai.Client(
+    api_key=GEMINI_KEY,
+    http_options={'api_version': 'v1beta'} 
+)
 
-# Flask setup
 app = Flask(__name__)
 CORS(app)
-
-# Tesseract path (Windows)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ----------------- ROUTES -----------------
-@app.route("/")
-def home():
-    return "Backend running with OCR + Gemini!"
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -38,74 +36,56 @@ def analyze():
     file.save(filepath)
 
     try:
-        # --- OCR ---
-        raw_text = pytesseract.image_to_string(Image.open(filepath))
+        # Use 'with' so the file is automatically closed as soon as this block ends
+        # ... inside the try block ...
+        with Image.open(filepath) as raw_image:
+            response = client.models.generate_content(
+                model="gemini-3-flash-preview", 
+                contents=[
+                    "Read the ingredients from this product label and analyze them for skin/health risks.",
+                    raw_image
+                ],
+                config=types.GenerateContentConfig(
+                    # REMOVED: thinking=types.ThinkingConfig(...)
+                    response_mime_type="application/json",
+                    response_schema={
+                        "type": "OBJECT",
+                        "properties": {
+                            "ingredients": {
+                                "type": "ARRAY",
+                                "items": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "name": {"type": "STRING"},
+                                        "risk_level": {"type": "STRING", "enum": ["Low", "Moderate", "High"]},
+                                        "reason": {"type": "STRING"},
+                                        "recommended_for": {"type": "STRING"},
+                                        "avoid_if": {"type": "STRING"}
+                                    },
+                                    "required": ["name", "risk_level", "reason"]
+                                }
+                            },
+                            "overall_product_risk": {"type": "STRING", "enum": ["Low", "Moderate", "High"]}
+                        },
+                        "required": ["ingredients", "overall_product_risk"]
+                    }
+                )
+            )
+
+        # The image file is now CLOSED. It is safe to return the response.
+        return jsonify(response.parsed)
+
     except Exception as e:
-        os.remove(filepath)
-        return jsonify({"error": str(e)}), 500
+        print(f"Detailed Error: {e}")
+        return jsonify({"error": "AI Analysis failed", "details": str(e)}), 500
     finally:
-        os.remove(filepath)
+        # Now that the 'with' block is done, os.remove won't trigger WinError 32
+        if os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                print(f"Cleanup error: {e}")
 
-    # --- Clean Ingredients ---
-    text = raw_text.replace("\n", " ").replace("Ingredients:", "")
-    text = text.replace("Shampoo", "").replace("Conditioner", "")
-    raw_ingredients = text.split(",")
-
-    cleaned = []
-    for item in raw_ingredients:
-        item = item.strip().replace(".", "")
-        item = " ".join(item.split())
-        if len(item) > 3 and not item.lower().startswith("cu dove"):
-            cleaned.append(item)
-
-    # Remove duplicates
-    unique_ingredients = []
-    seen = set()
-    for ing in cleaned:
-        key = ing.lower()
-        if key not in seen:
-            seen.add(key)
-            unique_ingredients.append(ing)
-
-    if not unique_ingredients:
-        return jsonify({"error": "No ingredients detected"}), 400
-
-    # --- Gemini LLM Prompt ---
-    prompt = f"""
-    You are an expert cosmetic/medicine ingredient analyzer.
-
-    Analyze these ingredients: {unique_ingredients}
-
-    For each ingredient:
-    - Give risk level (Low/Moderate/High)
-    - Short explanation of risks
-    - Suitable skin type / user group
-    - Who should avoid it
-
-    Also give overall product risk (Low/Moderate/High)
-
-    Return ONLY JSON in this format:
-
-    {{
-      "ingredients": [
-        {{
-          "name": "...",
-          "risk_level": "...",
-          "reason": "...",
-          "recommended_for": "...",
-          "avoid_if": "..."
-        }}
-      ],
-      "overall_product_risk": "..."
-    }}
-    """
-
-    # --- Call Gemini API ---
-    response = model.generate_content(prompt)
-    analysis_json = response.text
-
-    return analysis_json
-
-# ----------------- RUN -----------------
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
