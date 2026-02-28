@@ -1,0 +1,496 @@
+{
+  "butylated hydroxyanisole": {
+    "display_name": "Butylated Hydroxyanisole",
+    "synonyms": ["BHA"],
+    "e_number": "E320",
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Food Antioxidant / Preservative",
+    "avoid_for": ["Children", "Pregnant Women"],
+    "reason": "Possible carcinogenic properties in long-term exposure",
+    "safer_alternative": "Natural antioxidants like Vitamin E",
+    "source": "WHO Chemical Safety Review"
+  },
+
+  "butylated hydroxytoluene": {
+    "display_name": "Butylated Hydroxytoluene",
+    "synonyms": ["BHT"],
+    "e_number": "E321",
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Food Antioxidant / Preservative",
+    "avoid_for": ["Children", "Pregnant Women"],
+    "reason": "Linked to potential liver and kidney stress",
+    "safer_alternative": "Natural plant-based antioxidants",
+    "source": "WHO Food Additive Review"
+  },
+
+  "titanium dioxide": {
+    "display_name": "Titanium Dioxide",
+    "synonyms": [],
+    "e_number": "E171",
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Food Colorant / Cosmetic Pigment",
+    "avoid_for": ["Children"],
+    "reason": "Concerns over nano-particle accumulation in body",
+    "safer_alternative": "Natural mineral-based pigments",
+    "source": "EU Food Safety Authority"
+  },
+
+  "potassium bromate": {
+    "display_name": "Potassium Bromate",
+    "synonyms": [],
+    "e_number": "E924",
+    "risk_level": "High",
+    "risk_score": 5,
+    "category": "Flour Improver",
+    "avoid_for": ["Everyone"],
+    "reason": "Classified as possible carcinogen",
+    "safer_alternative": "Unbleached, bromate-free flour",
+    "source": "WHO Cancer Research"
+  },
+
+  "high fructose corn syrup": {
+    "display_name": "High Fructose Corn Syrup",
+    "synonyms": ["HFCS"],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Sweetener",
+    "avoid_for": ["Diabetic Patients", "Children"],
+    "reason": "Associated with obesity and insulin resistance",
+    "safer_alternative": "Natural sweeteners like honey or stevia",
+    "source": "WHO Nutrition Guidelines"
+  },
+
+  "phthalates": {
+    "display_name": "Phthalates",
+    "synonyms": ["DEP", "DBP", "DEHP"],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 5,
+    "category": "Plasticizer / Cosmetic Additive",
+    "avoid_for": ["Pregnant Women"],
+    "reason": "Linked to reproductive and developmental toxicity",
+    "safer_alternative": "Phthalate-free formulations",
+    "source": "WHO Chemical Risk Report"
+  },
+
+  "triclosan": {
+    "display_name": "Triclosan",
+    "synonyms": [],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Antibacterial Agent",
+    "avoid_for": ["Pregnant Women", "Children"],
+    "reason": "Hormonal disruption and antibiotic resistance concerns",
+    "safer_alternative": "Alcohol-based sanitizing agents",
+    "source": "FDA Advisory"
+  },
+
+  "hydroquinone": {
+    "display_name": "Hydroquinone",
+    "synonyms": [],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Skin Lightening Agent",
+    "avoid_for": ["Pregnant Women"],
+    "reason": "May cause skin damage and ochronosis",
+    "safer_alternative": "Vitamin C or Niacinamide-based products",
+    "source": "WHO Cosmetic Guidelines"
+  },
+
+  "coal tar dyes": {
+    "display_name": "Coal Tar Dyes",
+    "synonyms": [],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 5,
+    "category": "Artificial Colorant",
+    "avoid_for": ["Children", "Allergic Patients"],
+    "reason": "Linked to cancer and allergic reactions",
+    "safer_alternative": "Plant-based natural colors",
+    "source": "WHO Toxic Substance Report"
+  },
+
+  "cyclamate": {
+    "display_name": "Cyclamate",
+    "synonyms": [],
+    "e_number": "E952",
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Artificial Sweetener",
+    "avoid_for": ["Children", "Pregnant Women"],
+    "reason": "Banned in several countries due to cancer concerns",
+    "safer_alternative": "Stevia or monk fruit extract",
+    "source": "International Food Safety Review"
+  },
+
+  "sodium lauryl sulfate": {
+    "display_name": "Sodium Lauryl Sulfate",
+    "synonyms": ["SLS"],
+    "e_number": null,
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Surfactant",
+    "avoid_for": ["Children", "Sensitive Skin Patients"],
+    "reason": "May cause irritation and dryness",
+    "safer_alternative": "Sulfate-free cleansers",
+    "source": "FDA Cosmetic Ingredient Review"
+  },
+
+  "dea compounds": {
+    "display_name": "DEA Compounds",
+    "synonyms": ["Diethanolamine"],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Foaming Agent",
+    "avoid_for": ["Pregnant Women", "Children"],
+    "reason": "May form carcinogenic nitrosamines",
+    "safer_alternative": "Coconut-based foaming agents",
+    "source": "WHO Chemical Safety"
+  },
+
+  "toluene": {
+    "display_name": "Toluene",
+    "synonyms": [],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 5,
+    "category": "Solvent",
+    "avoid_for": ["Pregnant Women"],
+    "reason": "Neurotoxic solvent affecting fetal development",
+    "safer_alternative": "Toluene-free nail products",
+    "source": "WHO Toxicology"
+  },
+
+  "resorcinol": {
+    "display_name": "Resorcinol",
+    "synonyms": [],
+    "e_number": null,
+    "risk_level": "High",
+    "risk_score": 4,
+    "category": "Hair Dye Chemical",
+    "avoid_for": ["Pregnant Women", "Children"],
+    "reason": "May disrupt thyroid function",
+    "safer_alternative": "Ammonia-free herbal hair dyes",
+    "source": "WHO Cosmetic Safety"
+  },
+  
+  "polysorbate 80": {
+    "display_name": "Polysorbate 80",
+    "synonyms": [],
+    "e_number": "E433",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Emulsifier",
+    "avoid_for": ["Allergic Patients"],
+    "reason": "May cause hypersensitivity reactions in sensitive individuals",
+    "safer_alternative": "Natural lecithin-based emulsifiers",
+    "source": "EU Food Safety Review"
+  },
+
+  "carrageenan": {
+    "display_name": "Carrageenan",
+    "synonyms": [],
+    "e_number": "E407",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Thickening Agent",
+    "avoid_for": ["People with Digestive Disorders"],
+    "reason": "May cause gastrointestinal inflammation in high amounts",
+    "safer_alternative": "Agar or pectin",
+    "source": "WHO Food Additive Evaluation"
+  },
+
+  "tartrazine": {
+    "display_name": "Tartrazine",
+    "synonyms": [],
+    "e_number": "E102",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Color",
+    "avoid_for": ["Children", "Allergic Patients"],
+    "reason": "Linked to hyperactivity and allergic reactions",
+    "safer_alternative": "Natural turmeric-based coloring",
+    "source": "EU Food Authority"
+  },
+
+  "sunset yellow": {
+    "display_name": "Sunset Yellow FCF",
+    "synonyms": [],
+    "e_number": "E110",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Color",
+    "avoid_for": ["Children", "Allergic Patients"],
+    "reason": "May trigger hyperactivity in children",
+    "safer_alternative": "Paprika extract",
+    "source": "EU Food Authority"
+  },
+
+  "azorubine": {
+    "display_name": "Azorubine",
+    "synonyms": ["Carmoisine"],
+    "e_number": "E122",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Color",
+    "avoid_for": ["Children"],
+    "reason": "Associated with behavioral effects in children",
+    "safer_alternative": "Beetroot extract",
+    "source": "Food Safety Review Board"
+  },
+
+  "ponceau 4r": {
+    "display_name": "Ponceau 4R",
+    "synonyms": [],
+    "e_number": "E124",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Color",
+    "avoid_for": ["Children", "Allergic Patients"],
+    "reason": "Possible allergen and hyperactivity link",
+    "safer_alternative": "Natural fruit-based coloring",
+    "source": "EU Food Safety Authority"
+  },
+
+  "allura red": {
+    "display_name": "Allura Red AC",
+    "synonyms": [],
+    "e_number": "E129",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Color",
+    "avoid_for": ["Children"],
+    "reason": "Linked to behavioral issues in some studies",
+    "safer_alternative": "Pomegranate extract",
+    "source": "Food Additive Review"
+  },
+
+  "propylene glycol": {
+    "display_name": "Propylene Glycol",
+    "synonyms": [],
+    "e_number": "E1520",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Humectant / Solvent",
+    "avoid_for": ["Elderly", "Kidney Patients"],
+    "reason": "May cause metabolic stress in excessive intake",
+    "safer_alternative": "Vegetable glycerin",
+    "source": "FDA Ingredient Assessment"
+  },
+
+  "aspartame": {
+    "display_name": "Aspartame",
+    "synonyms": [],
+    "e_number": "E951",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Sweetener",
+    "avoid_for": ["Pregnant Women", "Phenylketonuria Patients"],
+    "reason": "Breaks down into phenylalanine; not suitable for PKU patients",
+    "safer_alternative": "Stevia",
+    "source": "WHO Sweetener Review"
+  },
+
+  "saccharin": {
+    "display_name": "Saccharin",
+    "synonyms": [],
+    "e_number": "E954",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Artificial Sweetener",
+    "avoid_for": ["Children"],
+    "reason": "Artificial sweetener with controversial long-term studies",
+    "safer_alternative": "Natural monk fruit extract",
+    "source": "FDA Food Additive Report"
+  },
+
+  "xanthan gum": {
+    "display_name": "Xanthan Gum",
+    "synonyms": [],
+    "e_number": "E415",
+    "risk_level": "Medium",
+    "risk_score": 2,
+    "category": "Stabilizer / Thickener",
+    "avoid_for": ["Infants"],
+    "reason": "May cause digestive discomfort in high quantities",
+    "safer_alternative": "Guar gum",
+    "source": "Food Safety Authority"
+  },
+
+  "sodium sulfite": {
+    "display_name": "Sodium Sulfite",
+    "synonyms": [],
+    "e_number": "E221",
+    "risk_level": "Medium",
+    "risk_score": 3,
+    "category": "Preservative",
+    "avoid_for": ["Asthmatic Patients"],
+    "reason": "Can trigger asthma attacks in sensitive individuals",
+    "safer_alternative": "Natural antioxidants",
+    "source": "WHO Additive Safety"
+  },
+  
+  "lecithin": {
+    "display_name": "Lecithin",
+    "synonyms": ["soy lecithin"],
+    "e_number": "E322",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Emulsifier",
+    "avoid_for": [],
+    "reason": "Naturally occurring emulsifier derived from soy or sunflower",
+    "safer_alternative": null,
+    "source": "WHO Food Additive Guidelines"
+  },
+
+  "calcium carbonate": {
+    "display_name": "Calcium Carbonate",
+    "synonyms": [],
+    "e_number": "E170",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Mineral / Acidity Regulator",
+    "avoid_for": [],
+    "reason": "Naturally occurring mineral used as calcium supplement",
+    "safer_alternative": null,
+    "source": "WHO Nutrition Report"
+  },
+
+  "agar": {
+    "display_name": "Agar",
+    "synonyms": [],
+    "e_number": "E406",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Thickening Agent",
+    "avoid_for": [],
+    "reason": "Plant-based gelling agent derived from seaweed",
+    "safer_alternative": null,
+    "source": "FAO Food Safety Review"
+  },
+
+  "pectin": {
+    "display_name": "Pectin",
+    "synonyms": [],
+    "e_number": "E440",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Stabilizer / Gelling Agent",
+    "avoid_for": [],
+    "reason": "Natural fiber found in fruits",
+    "safer_alternative": null,
+    "source": "WHO Nutrition Guidelines"
+  },
+
+  "stevia": {
+    "display_name": "Stevia",
+    "synonyms": ["steviol glycosides"],
+    "e_number": "E960",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Natural Sweetener",
+    "avoid_for": [],
+    "reason": "Plant-derived low-calorie sweetener",
+    "safer_alternative": null,
+    "source": "WHO Sweetener Evaluation"
+  },
+
+  "beta carotene": {
+    "display_name": "Beta Carotene",
+    "synonyms": [],
+    "e_number": "E160a",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Natural Color",
+    "avoid_for": [],
+    "reason": "Natural pigment found in carrots and vegetables",
+    "safer_alternative": null,
+    "source": "WHO Nutrition Guidelines"
+  },
+
+  "alpha tocopherol": {
+    "display_name": "Vitamin E",
+    "synonyms": ["alpha tocopherol"],
+    "e_number": "E307",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Antioxidant",
+    "avoid_for": [],
+    "reason": "Essential fat-soluble vitamin with antioxidant properties",
+    "safer_alternative": null,
+    "source": "WHO Nutrition Report"
+  },
+
+  "glycerin": {
+    "display_name": "Glycerin",
+    "synonyms": ["glycerol"],
+    "e_number": "E422",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Humectant",
+    "avoid_for": [],
+    "reason": "Naturally derived moisturizing agent",
+    "safer_alternative": null,
+    "source": "Cosmetic Ingredient Safety Review"
+  },
+
+  "malic acid": {
+    "display_name": "Malic Acid",
+    "synonyms": [],
+    "e_number": "E296",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Acidity Regulator",
+    "avoid_for": [],
+    "reason": "Naturally occurring acid in apples",
+    "safer_alternative": null,
+    "source": "Food Safety Authority"
+  },
+
+  "lactic acid": {
+    "display_name": "Lactic Acid",
+    "synonyms": [],
+    "e_number": "E270",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Acidity Regulator",
+    "avoid_for": [],
+    "reason": "Naturally produced during fermentation",
+    "safer_alternative": null,
+    "source": "WHO Food Additive Guidelines"
+  },
+
+  "sodium ascorbate": {
+    "display_name": "Sodium Ascorbate",
+    "synonyms": [],
+    "e_number": "E301",
+    "risk_level": "Low",
+    "risk_score": 1,
+    "category": "Antioxidant",
+    "avoid_for": [],
+    "reason": "Salt form of Vitamin C",
+    "safer_alternative": null,
+    "source": "WHO Nutrition Review"
+  },
+
+  "potassium sorbate": {
+    "display_name": "Potassium Sorbate",
+    "synonyms": [],
+    "e_number": "E202",
+    "risk_level": "Low",
+    "risk_score": 2,
+    "category": "Preservative",
+    "avoid_for": [],
+    "reason": "Widely used and generally recognized as safe preservative",
+    "safer_alternative": null,
+    "source": "FDA Food Additive Report"
+  }
+}
+
