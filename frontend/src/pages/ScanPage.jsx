@@ -5,6 +5,9 @@ import {
   FaCheckCircle, FaCamera, FaMicroscope, FaShieldAlt, FaInfoCircle, FaFileAlt
 } from "react-icons/fa";
 
+// IMPORTANT: Ensure ChatBot.jsx exists in the same directory
+import ChatBot from "./ChatBot"; 
+
 function App() {
   const [view, setView] = useState("dashboard"); // dashboard, scan, report, history
   const [category, setCategory] = useState(null);
@@ -29,9 +32,9 @@ function App() {
       risk: data.overall_product_risk, 
       score: data.safety_score, 
       date: new Date().toLocaleDateString(),
-      fullData: data // Store full data to re-view from history if needed
+      fullData: data 
     });
-    setView("report"); // Switch to full-screen report page
+    setView("report"); 
   };
 
   return (
@@ -138,8 +141,6 @@ function ScanPage({ category, onBack, onSuccess }) {
       <button onClick={onBack} style={styles.backButton}><FaArrowLeft /> Change Category</button>
       <div style={styles.scanCard}>
         <h2 style={styles.sectionTitle}><FaCamera /> Scan {category.title} Label</h2>
-        <p style={styles.subtitle}>Place the product label clearly in the frame</p>
-
         <div style={styles.uploadSection}>
           {!isCameraOpen ? (
             <div style={styles.dropZone}>
@@ -164,9 +165,7 @@ function ScanPage({ category, onBack, onSuccess }) {
             </div>
           )}
         </div>
-
         <canvas ref={canvasRef} width="640" height="480" style={{display: 'none'}} />
-
         <button 
           onClick={handleDetect} 
           disabled={!selectedFile || loading} 
@@ -179,7 +178,7 @@ function ScanPage({ category, onBack, onSuccess }) {
   );
 }
 
-// --- SCREEN 2: FULL REPORT PAGE ---
+// --- SCREEN 2: FULL REPORT PAGE (Integrated with ChatBot) ---
 const ReportPage = ({ result, category, onBack }) => {
   if (!result) return null;
 
@@ -191,7 +190,6 @@ const ReportPage = ({ result, category, onBack }) => {
       </div>
 
       <div style={styles.reportGrid}>
-        {/* Left Side: Score & Warnings */}
         <div style={styles.reportSide}>
           <div style={{...styles.scoreCardLarge, borderColor: result.safety_score > 70 ? '#2ecc71' : '#e74c3c'}}>
             <span style={styles.hugeScore}>{result.safety_score}</span>
@@ -200,7 +198,6 @@ const ReportPage = ({ result, category, onBack }) => {
               {result.overall_product_risk} Risk
             </div>
           </div>
-
           <div style={styles.alertBox}>
             <h3><FaExclamationTriangle color="#e11d48" /> Critical Warnings</h3>
             <p><strong>Not recommended for:</strong> {result.not_recommended_for.join(", ")}</p>
@@ -208,7 +205,6 @@ const ReportPage = ({ result, category, onBack }) => {
           </div>
         </div>
 
-        {/* Right Side: Ingredients & Alternatives */}
         <div style={styles.reportMain}>
           <div style={styles.ingredientSection}>
             <h3><FaMicroscope /> Ingredient Analysis</h3>
@@ -223,7 +219,6 @@ const ReportPage = ({ result, category, onBack }) => {
               </div>
             </div>
           </div>
-
           <div style={styles.alternativesSection}>
             <h3><FaCheckCircle color="#059669" /> Recommended Safer Alternatives</h3>
             <div style={styles.altGrid}>
@@ -238,6 +233,9 @@ const ReportPage = ({ result, category, onBack }) => {
           </div>
         </div>
       </div>
+
+      {/* CHATBOT COMPONENT ADDED HERE */}
+      <ChatBot context={result} category={category.title} />
     </div>
   );
 };
@@ -258,8 +256,8 @@ const Dashboard = ({ onSelect }) => {
         {categories.map((cat) => (
           <div key={cat.id} style={styles.megaCard} onClick={() => onSelect(cat)}>
             <div style={{ ...styles.megaIcon, backgroundColor: cat.color }}>{cat.icon}</div>
-            <h2>{cat.title}</h2>
-            <p>{cat.desc}</p>
+            <h2 style={{fontSize: '24px', margin: '15px 0'}}>{cat.title}</h2>
+            <p style={{color: '#64748b'}}>{cat.desc}</p>
           </div>
         ))}
       </div>
@@ -290,27 +288,21 @@ const HistoryPage = ({ history, onBack, onView, onClear }) => (
   </div>
 );
 
-// --- UPDATED LAPTOP STYLES ---
 const styles = {
   appWrapper: { minHeight: "100vh", backgroundColor: "#f8fafc", fontFamily: "'Inter', sans-serif" },
   navBar: { display: 'flex', justifyContent: 'space-between', padding: '20px 80px', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' },
   logo: { display: 'flex', alignItems: 'center', fontSize: '26px', fontWeight: '800', cursor: 'pointer', color: '#1e293b' },
   navLink: { background: 'none', border: 'none', fontSize: '16px', fontWeight: '600', cursor: 'pointer', color: '#64748b' },
   navHistoryBtn: { padding: '10px 20px', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' },
-  
   mainContent: { padding: '40px 80px' },
   centerContainer: { maxWidth: '800px', margin: '0 auto' },
-  
-  // Dashboard
   heroText: { fontSize: '42px', textAlign: 'center', marginBottom: '50px', color: '#0f172a', fontWeight: '800' },
   laptopGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px' },
   megaCard: { backgroundColor: 'white', padding: '50px 30px', borderRadius: '32px', textAlign: 'center', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' },
   megaIcon: { width: '90px', height: '90px', borderRadius: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '40px', margin: '0 auto 25px' },
-
-  // Scan Page
   scanCard: { backgroundColor: 'white', padding: '50px', borderRadius: '32px', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
   uploadSection: { margin: '30px 0' },
-  dropZone: { border: '3px dashed #cbd5e0', padding: '40px', borderRadius: '24px', backgroundColor: '#f1f5f9' },
+  dropZone: { border: '3px dashed #cbd5e0', padding: '40px', borderRadius: '24px', backgroundColor: '#f1f5f9', position: 'relative' },
   fullPreview: { maxWidth: '100%', maxHeight: '300px', borderRadius: '16px' },
   cameraBox: { backgroundColor: '#000', borderRadius: '24px', overflow: 'hidden', padding: '10px' },
   videoStream: { width: '100%', borderRadius: '16px' },
@@ -318,10 +310,9 @@ const styles = {
   cancelBtn: { background: 'none', color: 'white', border: 'none', marginTop: '10px', cursor: 'pointer' },
   mainDetectBtn: { width: '100%', padding: '22px', borderRadius: '18px', border: 'none', color: 'white', fontSize: '20px', fontWeight: '800', cursor: 'pointer' },
   secondaryBtn: { padding: '12px 24px', borderRadius: '12px', border: '1px solid #cbd5e0', background: 'white', cursor: 'pointer', fontWeight: '600' },
-
-  // Report Page
   fullReportContainer: { maxWidth: '1200px', margin: '0 auto' },
   reportHeader: { display: 'flex', alignItems: 'center', gap: '30px', marginBottom: '40px' },
+  laptopTitle: { fontSize: '32px', fontWeight: '800', color: '#1e293b' },
   reportGrid: { display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '40px' },
   reportSide: { display: 'flex', flexDirection: 'column', gap: '25px' },
   scoreCardLarge: { backgroundColor: 'white', padding: '50px', borderRadius: '32px', textAlign: 'center', border: '8px solid', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' },
@@ -336,10 +327,12 @@ const styles = {
   alternativesSection: { backgroundColor: '#f0fdf4', padding: '40px', borderRadius: '32px', border: '1px solid #bbf7d0' },
   altGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px' },
   altCardFull: { backgroundColor: 'white', padding: '25px', borderRadius: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' },
-
   backButton: { background: 'none', border: 'none', color: '#64748b', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px' },
   historyItem: { backgroundColor: 'white', padding: '20px', borderRadius: '20px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '20px', cursor: 'pointer', border: '1px solid #e2e8f0' },
-  statusDot: { width: '12px', height: '12px', borderRadius: '50%' }
+  statusDot: { width: '12px', height: '12px', borderRadius: '50%' },
+  headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
+  clearBtn: { border: 'none', background: 'none', color: '#e11d48', cursor: 'pointer', fontWeight: 'bold' },
+  fileInput: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }
 };
 
 export default App;

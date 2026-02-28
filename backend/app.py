@@ -97,5 +97,26 @@ def analyze():
             except Exception as e:
                 print(f"Cleanup error: {e}")
 
+# Add this import at the top
+from Chatbot import handle_chat_query
+
+# ... your existing imports and setup ...
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.json
+    # Pass the client and data to our modular function
+    result = handle_chat_query(
+        client, 
+        data.get("query"), 
+        data.get("context"), 
+        data.get("category")
+    )
+    
+    if "error" in result:
+        return jsonify(result), 500
+    return jsonify(result)
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
