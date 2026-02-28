@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { FaCloudUploadAlt, FaCamera } from "react-icons/fa"
 
+
 function ScanPage() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [preview, setPreview] = useState(null)
   const [loading, setLoading] = useState(false)
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
@@ -12,10 +14,13 @@ function ScanPage() {
     setPreview(URL.createObjectURL(file))
   }
 
+
   const handleDetect = () => {
     if (!selectedFile) return
 
+
     setLoading(true)
+
 
     // Simulate backend delay
     setTimeout(() => {
@@ -24,14 +29,17 @@ function ScanPage() {
     }, 2000)
   }
 
+
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Upload Product Label</h2>
+
 
       <div style={styles.uploadBox}>
         <FaCloudUploadAlt size={50} color="#2ecc71" />
         <h3>Upload Photo</h3>
         <p>Drag & drop or select from gallery</p>
+
 
         <label style={styles.galleryButton}>
           Choose from Gallery
@@ -42,6 +50,7 @@ function ScanPage() {
           />
         </label>
 
+
         {preview && (
           <img
             src={preview}
@@ -51,12 +60,15 @@ function ScanPage() {
         )}
       </div>
 
+
       <p style={{ margin: "20px 0" }}>OR</p>
+
 
       <button style={styles.cameraButton}>
         <FaCamera style={{ marginRight: "10px" }} />
         Open Camera
       </button>
+
 
       <button
         onClick={handleDetect}
@@ -72,6 +84,7 @@ function ScanPage() {
     </div>
   )
 }
+
 
 const styles = {
   container: {
