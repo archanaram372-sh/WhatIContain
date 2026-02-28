@@ -13,16 +13,16 @@
 - Member 2: [Najiya K K] - [Government Engineering College, Palakkad]
 
 ### Hosted Project Link
-[mention your project hosted link here]
+[https://github.com/archanaram372-sh/WhatIContain/]
 
 ### Project Description
-[2-3 lines about what your project does]
+[What I Contain is an AI-powered safety scanner that allows users to instantly analyze product labels across cosmetics, food, and healthcare. By using the Gemini 3 Flash model, it extracts ingredient lists from photos and provides a simplified safety report with numerical health scores.]
 
 ### The Problem statement
-[What problem are you solving?]
+[Consumers are often overwhelmed by complex chemical names and "marketing speak" on product labels, making it difficult to identify hidden toxins, allergens, or harmful additives. Traditional manual research is time-consuming and requires specialized knowledge that the average shopper does not possess.]
 
 ### The Solution
-[How are you solving it?]
+[We provide a real-time mobile and web interface that translates "chemical jargon" into actionable data. By categorizing risks into High, Moderate, and Low and offering personalized warnings for specific demographics (like children or pregnant women), the app empowers users to make safer purchasing decisions in seconds.]
 
 ---
 
@@ -31,25 +31,28 @@
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
-- Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+- Languages used: [Python (Backend Logic), JavaScript (Frontend Interface), HTML5/CSS3 (UI Structure & Styling).]
+- Frameworks used: [React.js (Frontend Framework), Flask (Python Web Framework), Vite (Frontend Build Tool).]
+- Libraries used: [Backend: google-genai (Gemini API integration), Flask-CORS (Cross-Origin Resource Sharing), Pillow (Image processing), python-dotenv (Environment variable management).
+Frontend: react-icons (UI iconography), Lucide-React (Optional icons), Fetch API (HTTP requests).]
+- Tools used: [VS Code (Development Environment), Git/GitHub (Version Control), Gemini .5 Flash (AI Inference Engine), Postman (API Testing)]
 
 **For Hardware:**
-- Main components: [List main components]
-- Specifications: [Technical specifications]
-- Tools required: [List tools needed]
+- Main components: [High-Resolution Camera: (Smartphone or Webcam) used for capturing clear images of ingredient labels. Processor: Minimum Quad-core CPU (for local development) or Cloud-based server (for hosting). Memory: 8GB RAM recommended for smooth development and local AI testing.]
+
+- Specifications: [Camera: 720p minimum (1080p preferred) to ensure text legibility for OCR (Optical Character Recognition). Network: Active Internet Connection (required for Gemini API calls).]
+
+- Tools required: [Standard Development Laptop/PC. Mobile Device (for testing real-world scanning and camera responsiveness).]
 
 ---
 
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1_Expert AI Personas: [Uses specialized logic (e.g., Dermatologist for skincare, Nutritionist for food) to provide category-specific safety insights rather than generic text extraction.]
+- Feature 2_Precision Risk Scoring: [Translates complex labels into a strict 0–100 Safety Score with color-coded risk levels (Low, Moderate, High) for instant user interpretation.]
+- Feature 3_Vulnerable Group Alerts & Smart Alternatives: [Automatically flags ingredients unsafe for specific demographics, such as pregnant women, children, or those with common allergies.Also, Instantly suggests "clean" product alternatives for high-risk items, explaining exactly why the recommended product is a healthier choice.]
+- Feature 4_Context-Aware Chatbot: [Allows users to ask follow-up questions about the scanned results in real-time, providing deeper education on specific chemical compounds.]
 
 ---
 
@@ -61,20 +64,39 @@ List the key features of your project:
 ```bash
 [Installation commands - e.g., npm install, pip install -r requirements.txt]
 ```
+cd WhatIContain, Backend setup: cd backend
+pip install flask flask-cors pillow python-dotenv google-genai, Frontend Setup: cd ../frontend
+npm install
+npm install react-icons
 
 #### Run
 ```bash
 [Run commands - e.g., npm start, python app.py]
 ```
+Backend : python app.py
+Frontend : npm run dev
 
 ### For Hardware:
 
 #### Components Required
 [List all components needed with specifications]
+Computing Host: Laptop or PC (Core i5+, 8GB RAM) to run the Flask server and React UI.
+
+Imaging Sensor: 1080p Web Camera or Integrated Smartphone Camera (for label legibility).
+
+Internet Gateway: High-speed Wi-Fi or Ethernet (required for real-time Gemini API calls).
+
+Mobile Test Device: Android or iOS device for testing the live camera interface.
 
 #### Circuit Setup
 [Explain how to set up the circuit]
+Since this is a software-heavy AI project, the "circuit" involves the data flow between components:
 
+Input Device: Connect the USB Web Camera to the PC or use the built-in mobile camera via the browser.
+
+Server Link: Ensure the Frontend (React) is pointed to the Backend (Flask) local IP address (127.0.0.1:5000).
+
+API Bridge: Ensure your .env file contains a valid GEMINI_KEY to allow the software to communicate with Google's AI servers.
 ---
 
 ## Project Documentation
@@ -84,20 +106,45 @@ List the key features of your project:
 #### Screenshots (Add at least 3)
 
 ![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+![alt text](<Screenshot 2026-02-28 210639.png>)
+Category Selection: 
+Users choose a product type (Cosmetics, Food, etc.), which activates a specialized AI persona for context-aware analysis.
 
 ![Screenshot2](Add screenshot 2 here with proper name)
+![alt text](<Screenshot 2026-02-28 210656.png>)
 *Add caption explaining what this shows*
+Image Capture:
+The interface supports both direct image uploads and real-time laptop camera capture to digitize product labels.
 
 ![Screenshot3](Add screenshot 3 here with proper name)
+![alt text](<Screenshot 2026-02-28 210849.png>)
 *Add caption explaining what this shows*
+Safety Scoring: The system generates a numerical Safety Score and color-coded Risk Level (e.g., "Moderate Risk" in yellow) based on ingredient toxicity.
+Health Alerts: AI flags "Avoid if" conditions for specific demographics like children, pregnant women, or those with allergies.
 
 #### Diagrams
 
 **System Architecture:**
 
 ![Architecture Diagram](docs/architecture.png)
+![alt text](system_architecture.jpeg)
 *Explain your system architecture - components, data flow, tech stack interaction*
+1. User Interaction Layer
+The system serves three primary user personas: Regular Consumers, Vulnerable Groups (e.g., pregnant women), and Allergy-Prone Users. They interact with the platform by:
+Data Input: Uploading or capturing product images (Food, Cosmetics, or Medicine) via mobile/laptop camera.
+Profile Management: Creating personalized profiles that store specific health vulnerabilities or preferences to tailor the analysis.
+History Tracking: Accessing a "Scan History" to review previous product evaluations.
+
+2. Processing & AI Core
+The backend architecture centers on a Dynamic LLM Core AI Engine:
+OCR & Extraction: Processes raw images to extract ingredient lists dynamically.
+Dynamic Analysis: Evaluates extracted data against health safety standards in real-time.
+
+3. Analysis & Output Modules
+The system generates three distinct types of output:
+Risk Dashboard: Visualizes safety scores with color-coded risk tiers—Red (High), Orange (Medium), and Green (Low). It specifically identifies risks for at-risk groups like children or the elderly.
+Conversational Assistant: An LLM-powered chatbot that allows users to ask for specific ingredient explanations or receive personalized health guidance.
+Smart Recommendations: Suggests minimally processed alternatives, compares them against the scanned product, and checks for local availability.
 
 **Application Workflow:**
 
@@ -111,7 +158,15 @@ List the key features of your project:
 #### Schematic & Circuit
 
 ![Circuit](Add your circuit diagram here)
+![alt text](Gemini_Generated_Image_n13l70n13l70n13l.png)
 *Add caption explaining connections*
+Input Stage (Capture): The user interacts with the Camera Module (Hardware) to capture light data, which is converted into digital signals. This data is sent through the Client Interface (Frontend) to the processing unit.
+Processing Stage (AI Core): The digital image travels to the Core AI Engine (Dynamic LLM). This acts as the "Central Processor" of the system, performing OCR (Optical Character Recognition) to extract text and Dynamic Analysis to identify chemical compounds.
+Logic & Decision Stage: The engine evaluates the data against pre-defined health safety thresholds. It applies specialized "Expert Personas" to determine if a compound is a risk based on the product category.
+Output Stage (Visualization): The results are transmitted back to the Risk Analysis Dashboard. This triggers visual output components:
+Logic Gates: Determine which color-coded risk level (Red, Orange, or Green) to activate.
+Communication Module: Sends personalized guidance to the LLM Chatbot for interactive user queries.
+Recommendation Engine: Fetches data for safer alternatives based on the analysis result.
 
 ![Schematic](Add your schematic diagram here)
 *Add caption explaining the schematic*
@@ -119,12 +174,14 @@ List the key features of your project:
 #### Build Photos
 
 ![Team](Add photo of your team here)
+![Team_pic](team_pic.jpeg)
 
 ![Components](Add photo of your components here)
 *List out all components shown*
 
 ![Build](Add photos of build process here)
 *Explain the build steps*
+![alt text](<Screenshot 2026-02-28 212719.png>)
 
 ![Final](Add photo of final product here)
 *Explain the final build*
@@ -137,7 +194,7 @@ List the key features of your project:
 
 #### API Documentation
 
-**Base URL:** `https://api.yourproject.com`
+**Base URL:** http://127.0.0.1:5000 (Local Development)
 
 ##### Endpoints
 
@@ -146,7 +203,26 @@ List the key features of your project:
 - **Parameters:**
   - `param1` (string): [Description]
   - `param2` (integer): [Description]
+POST /analyze
+Description: Accepts a product label image and category to return a detailed AI safety report.
+Parameters (Multipart/Form-Data):
+   file (image): The uploaded image of the product label.
+   category (string): The product type (e.g., "cosmetics", "food").
 - **Response:**
+{
+  "safety_score": 72,
+  "overall_product_risk": "Moderate",
+  "high_risk_ingredients": ["Salicylic Acid"],
+  "low_risk_ingredients": ["Aqua", "Glycerin"],
+  "not_recommended_for": ["Pregnant Women"],
+  "demographic_reasons": "Contains BHA which can cause irritation...",
+  "safer_alternatives": [
+    {
+      "product_name": "Alternative Name",
+      "why_better": "Lower concentration of irritants."
+    }
+  ]
+}
 ```json
 {
   "status": "success",
@@ -157,6 +233,14 @@ List the key features of your project:
 **POST /api/endpoint**
 - **Description:** [What it does]
 - **Request Body:**
+POST /chat
+Description: Handles follow-up questions about a previously scanned product using stored context.
+Request Body :
+{
+  "query": "Is this safe for children?",
+  "context": "{Full JSON object from /analyze}",
+  "category": "cosmetics"
+}
 ```json
 {
   "field1": "value1",
@@ -168,6 +252,10 @@ List the key features of your project:
 {
   "status": "success",
   "message": "Operation completed"
+}
+Response : 
+{
+  "reply": "Based on the ingredients, this product is generally safe, but avoid use on children under 3 due to..."
 }
 ```
 
@@ -270,11 +358,16 @@ xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug
 ```bash
 python script.py [options] [arguments]
 ```
+Run the backend server from the project root directory:
+python app.py
 
 **Available Commands:**
 - `command1 [args]` - Description of what command1 does
+    python app.py: Launches the Flask development server on http://127.0.0.1:5000
 - `command2 [args]` - Description of what command2 does
+    pip install -r requirements.txt: Installs all necessary Python dependencies (Flask, GenAI, Pillow).
 - `command3 [args]` - Description of what command3 does
+    python -m flask run: An alternative way to start the server if the Flask environment variables are configured.
 
 **Options:**
 - `-h, --help` - Show help message and exit
@@ -283,77 +376,81 @@ python script.py [options] [arguments]
 - `-c, --config FILE` - Specify configuration file
 - `--version` - Show version information
 
+--host=0.0.0.0: Allows the server to be accessible from other devices on your local network (e.g., testing on a mobile phone).
+--port=5000: Specifies the network port for the backend service.
+debug=True: Enables hot-reloading, which automatically restarts the server when you save changes to your code.
+
 **Examples:**
 
 ```bash
-# Example 1: Basic usage
-python script.py input.txt
+# Example 1: Basic Backend Start
+Launches the Flask server to handle image analysis and AI chat
+python app.py
 
-# Example 2: With verbose output
-python script.py -v input.txt
+# Example 2: Frontend Development Mode
+Runs the React interface with hot-reloading enabled
+npm run dev
 
-# Example 3: Specify output file
-python script.py -o output.txt input.txt
+# Example 3: Installing Dependencies
+ Ensures the environment has all required libraries like google-genai and Flask
+pip install -r requirements.txt
 
-# Example 4: Using configuration
-python script.py -c config.json --verbose input.txt
+# Example 4: Testing API Connectivity
+ Verifies the backend is reachable on the local network (port 5000)
+curl http://127.0.0.1:5000/
 ```
 
 #### Demo Output
 
-**Example 1: Basic Processing**
 
+**Example 1: Basic Processing**
+Example 1: Cosmetic Ingredient Analysis
 **Input:**
 ```
-This is a sample input file
-with multiple lines of text
-for demonstration purposes
+Image: A photo of a skincare label containing "Aqua, Glycerin, Salicylic Acid (2%), Triethanolamine."
+Selected Category: "Cosmetics"
 ```
 
 **Command:**
 ```bash
-python script.py sample.txt
+# Backend processes the multipart form-data from the React frontend
+POST /analyze { file: <image_data>, category: "cosmetics" }
 ```
 
 **Output:**
 ```
-Processing: sample.txt
-Lines processed: 3
-Characters counted: 86
-Status: Success
-Output saved to: output.txt
+{
+  "status": "success",
+  "product_analysis": {
+    "safety_score": 72,
+    "risk_level": "Moderate Risk",
+    "flagged_ingredients": ["Salicylic Acid (2%)", "Triethanolamine"],
+    "safe_ingredients": ["Aqua", "Glycerin"],
+    "demographic_alert": "Avoid if: Pregnant, breastfeeding, or sensitive skin types.",
+    "reason": "Contains BHA which can cause irritation in high concentrations."
+  }
+}
 ```
 
 **Example 2: Advanced Usage**
+Example 2: AI Health Assistant Interaction
 
 **Input:**
-```json
-{
-  "name": "test",
-  "value": 123
-}
+```Query: "Is this product safe for my 2-year-old child?"
+Context: Data from the previous "Cosmetics" scan.
 ```
 
 **Command:**
 ```bash
-python script.py -v --format json data.json
+# Sends a follow-up query to the ChatBot endpoint
+POST /chat { query: "Is this safe for my 2-year-old?", context: {...} }
 ```
 
 **Output:**
 ```
-[VERBOSE] Loading configuration...
-[VERBOSE] Parsing JSON input...
-[VERBOSE] Processing data...
 {
-  "status": "success",
-  "processed": true,
-  "result": {
-    "name": "test",
-    "value": 123,
-    "timestamp": "2024-02-07T10:30:00"
-  }
+  "reply": "No, it is not recommended for children under 3. The Salicylic Acid in this product is too harsh for an infant's developing skin barrier and may cause severe dryness or irritation."
 }
-[VERBOSE] Operation completed in 0.23s
 ```
 
 ---
@@ -375,22 +472,24 @@ python script.py -v --format json data.json
 If you used AI tools during development, document them here for transparency:
 
 **Tool Used:** [e.g., GitHub Copilot, v0.dev, Cursor, ChatGPT, Claude]
+Tool Used: Gemini 3 Flash (via Google AI Studio/Web)
 
 **Purpose:** [What you used it for]
-- Example: "Generated boilerplate React components"
-- Example: "Debugging assistance for async functions"
-- Example: "Code review and optimization suggestions"
+  Assisted in bridging the Flask (Python) backend with the React (Vite) frontend using multipart/form-data for image uploads.
+  Crafted the specialized "Threshold Rules" that ensure the AI provides a numerical safety score consistent with its risk categorization.
+  Resolved environment-specific errors, such as the ImportError: cannot import name 'genai' by identifying library version conflicts.
 
 **Key Prompts Used:**
-- "Create a REST API endpoint for user authentication"
-- "Debug this async function that's causing race conditions"
-- "Optimize this database query for better performance"
+- "Write a React component that can capture an image from a laptop webcam and send it to a Python backend."
+- "Format the AI response into a strict JSON schema including safety_score, risk_level, and demographic_reasons."
+- "Debug the Vite import error for a ChatBot component in a React project structure"
 
 **Percentage of AI-generated code:** [Approximately X%]
+  50%
 
 **Human Contributions:**
 - Architecture design and planning
-- Custom business logic implementation
+- Custom logic implementation
 - Integration and testing
 - UI/UX design decisions
 
@@ -400,15 +499,15 @@ If you used AI tools during development, document them here for transparency:
 
 ## Team Contributions
 
-- [Name 1]: [Specific contributions - e.g., Frontend development, API integration, etc.]
-- [Name 2]: [Specific contributions - e.g., Backend development, Database design, etc.]
-- [Name 3]: [Specific contributions - e.g., UI/UX design, Testing, Documentation, etc.]
+- [Archana K R]: [Specific contributions - e.g., Frontend development, API integration, Backend development, Testing etc.]
+- [Najiya K K]: [Specific contributions - e.g., UI/UX design, System architecture design, Documentation etc.]
 
 ---
 
 ## License
 
-This project is licensed under the [LICENSE_NAME] License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [ MIT License LICCopyright (c) 2026 archanaram372-sh
+] License - see the [LICENSE](LICENSE) file for details.
 
 **Common License Options:**
 - MIT License (Permissive, widely used)
