@@ -3,9 +3,12 @@ import { FaCloudUploadAlt, FaCamera } from "react-icons/fa"
 
 function ScanPage() {
   const [selectedFile, setSelectedFile] = useState(null)
+  const [preview, setPreview] = useState(null)
 
   const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0])
+    const file = e.target.files[0]
+    setSelectedFile(file)
+    setPreview(URL.createObjectURL(file))
   }
 
   return (
@@ -25,6 +28,14 @@ function ScanPage() {
             onChange={handleFileChange}
           />
         </label>
+
+        {preview && (
+          <img
+            src={preview}
+            alt="preview"
+            style={{ marginTop: "15px", width: "100%", borderRadius: "10px" }}
+          />
+        )}
       </div>
 
       <p style={{ margin: "20px 0" }}>OR</p>
@@ -34,7 +45,14 @@ function ScanPage() {
         Open Camera
       </button>
 
-      <button style={styles.detectButton}>
+      <button
+        style={{
+          ...styles.detectButton,
+          opacity: selectedFile ? 1 : 0.5,
+          cursor: selectedFile ? "pointer" : "not-allowed"
+        }}
+        disabled={!selectedFile}
+      >
         Detect Ingredients
       </button>
     </div>
@@ -81,8 +99,7 @@ const styles = {
     border: "none",
     backgroundColor: "#2ecc71",
     color: "white",
-    fontSize: "18px",
-    cursor: "pointer"
+    fontSize: "18px"
   }
 }
 
