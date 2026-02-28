@@ -7,11 +7,15 @@ from dotenv import load_dotenv
 from google import genai 
 from google.genai import types
 
+# Import the modular chatbot function
+# Ensure your file is named Chatbot.py (Case Sensitive)
+from Chatbot import handle_chat_query
+
 # 1. Setup & Config
 load_dotenv()
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 
-# Initialize the new Client 
+# Initialize the Gemini Client
 client = genai.Client(
     api_key=GEMINI_KEY,
     http_options={'api_version': 'v1beta'} 
@@ -23,6 +27,17 @@ CORS(app)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# ----------------- HELPERS -----------------
+
+def validate_risk_level(score):
+    """Manual override to ensure the text label matches the numerical score."""
+    if score >= 80:
+        return "Low"
+    elif score >= 50:
+        return "Moderate"
+    else:
+        return "High"
+
 # ----------------- ROUTES -----------------
 
 @app.route("/analyze", methods=["POST"])
@@ -32,19 +47,27 @@ def analyze():
     
     # 2. Get the file
     if "file" not in request.files:
-        return jsonify({"error": "No file"}), 400
+        return jsonify({"error": "No file uploaded"}), 400
     
     file = request.files["file"]
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
     try:
-        # Dynamic Persona/Instructions based on Category
+        # Strict instructions to prevent "Always Moderate" bias
+        threshold_rules = """
+        STRICT RULES FOR SCORING:
+        - You MUST use the full range of 0-100.
+        - If ingredients are hazardous, toxic, or banned, score MUST be below 50.
+        - If ingredients are standard but contain common irritants, score 50-79.
+        - If ingredients are clean/organic/safe, score 80-100.
+        """
+
         prompts = {
-            "cosmetics": "You are a dermatological expert. Analyze the skincare ingredients.",
-            "food": "You are a clinical nutritionist. Analyze the food additives and nutritional content.",
-            "healthcare": "You are a pharmacist. Analyze the medicinal compounds for safety.",
-            "processed": "You are a consumer safety expert. Analyze the chemical composition."
+            "cosmetics": "You are a dermatological expert. Analyze for endocrine disruptors, parabens, and allergens.",
+            "food": "You are a clinical nutritionist. Analyze for ultra-processed additives, high fructose corn syrup, and harmful dyes.",
+            "healthcare": "You are a pharmacist. Analyze for active ingredient safety and potential contraindications.",
+            "processed": "You are a consumer safety expert. Analyze for harsh industrial chemicals and VOCs."
         }
         
         selected_prompt = prompts.get(category_type, "You are a product safety expert.")
@@ -53,7 +76,7 @@ def analyze():
             response = client.models.generate_content(
                 model="gemini-3-flash-preview", 
                 contents=[
-                    f"{selected_prompt} Read the label from this image and provide a comprehensive safety report.",
+                    f"{selected_prompt} {threshold_rules} Analyze this label and return a JSON report.",
                     raw_image
                 ],
                 config=types.GenerateContentConfig(
@@ -61,12 +84,12 @@ def analyze():
                     response_schema={
                         "type": "OBJECT",
                         "properties": {
-                            "safety_score": {"type": "INTEGER"}, # 0-100 score
+                            "safety_score": {"type": "INTEGER"},
                             "overall_product_risk": {"type": "STRING", "enum": ["Low", "Moderate", "High"]},
                             "high_risk_ingredients": {"type": "ARRAY", "items": {"type": "STRING"}},
                             "moderate_risk_ingredients": {"type": "ARRAY", "items": {"type": "STRING"}},
                             "low_risk_ingredients": {"type": "ARRAY", "items": {"type": "STRING"}},
-                            "not_recommended_for": {"type": "ARRAY", "items": {"type": "STRING"}}, # e.g. ["Pregnant Women", "Children"]
+                            "not_recommended_for": {"type": "ARRAY", "items": {"type": "STRING"}},
                             "demographic_reasons": {"type": "STRING"},
                             "safer_alternatives": {
                                 "type": "ARRAY", 
@@ -84,28 +107,31 @@ def analyze():
                 )
             )
 
-        # Return the parsed detailed JSON
-        return jsonify(response.parsed)
+        # 3. Parse and Re-Validate
+        analysis_data = response.parsed
+        
+        # Apply the manual override to fix "Moderate" bias
+        score = analysis_data.get("safety_score", 50)
+        analysis_data["overall_product_risk"] = validate_risk_level(score)
+
+        return jsonify(analysis_data)
 
     except Exception as e:
-        print(f"Detailed Error: {e}")
-        return jsonify({"error": "AI Analysis failed", "details": str(e)}), 500
+        print(f"Server Error: {e}")
+        return jsonify({"error": "Analysis failed", "details": str(e)}), 500
+    
     finally:
+        # Cleanup uploaded file
         if os.path.exists(filepath):
-            try:
-                os.remove(filepath)
-            except Exception as e:
-                print(f"Cleanup error: {e}")
-
-# Add this import at the top
-from Chatbot import handle_chat_query
-
-# ... your existing imports and setup ...
+            os.remove(filepath)
 
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
-    # Pass the client and data to our modular function
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    # Pass logic to modular Chatbot.py
     result = handle_chat_query(
         client, 
         data.get("query"), 
@@ -116,7 +142,6 @@ def chat():
     if "error" in result:
         return jsonify(result), 500
     return jsonify(result)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
