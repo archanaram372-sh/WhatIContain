@@ -4,11 +4,24 @@ import { FaCloudUploadAlt, FaCamera } from "react-icons/fa"
 function ScanPage() {
   const [selectedFile, setSelectedFile] = useState(null)
   const [preview, setPreview] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     setSelectedFile(file)
     setPreview(URL.createObjectURL(file))
+  }
+
+  const handleDetect = () => {
+    if (!selectedFile) return
+
+    setLoading(true)
+
+    // Simulate backend delay
+    setTimeout(() => {
+      setLoading(false)
+      alert("Analysis Complete (Backend coming next)")
+    }, 2000)
   }
 
   return (
@@ -46,14 +59,15 @@ function ScanPage() {
       </button>
 
       <button
+        onClick={handleDetect}
         style={{
           ...styles.detectButton,
-          opacity: selectedFile ? 1 : 0.5,
-          cursor: selectedFile ? "pointer" : "not-allowed"
+          opacity: selectedFile && !loading ? 1 : 0.5,
+          cursor: selectedFile && !loading ? "pointer" : "not-allowed"
         }}
-        disabled={!selectedFile}
+        disabled={!selectedFile || loading}
       >
-        Detect Ingredients
+        {loading ? "Analyzing..." : "Detect Ingredients"}
       </button>
     </div>
   )
