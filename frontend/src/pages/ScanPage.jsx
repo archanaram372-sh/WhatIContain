@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { 
   FaCloudUploadAlt, FaLeaf, FaUtensils, FaMedkit, FaBoxOpen, 
   FaArrowLeft, FaHistory, FaTrash, FaExclamationTriangle, 
-  FaCheckCircle, FaCamera, FaMicroscope, FaShieldAlt, FaInfoCircle, FaFileAlt
+  FaCheckCircle, FaCamera, FaMicroscope, FaShieldAlt, FaInfoCircle, FaFileAlt, FaSyncAlt
 } from "react-icons/fa";
 
 // IMPORTANT: Ensure ChatBot.jsx exists in the same directory
@@ -92,21 +92,35 @@ function ScanPage({ category, onBack, onSuccess }) {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [facingMode, setFacingMode] = useState("environment"); 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const startCamera = async () => {
+  const startCamera = async (mode = facingMode) => {
     setIsCameraOpen(true);
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) videoRef.current.srcObject = stream;
+      if (videoRef.current?.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: mode } 
+      });
+      if (videoRef.current) videoRef.current.srcObject = stream;
     } catch (err) {
-        alert("Could not access camera. Check permissions.");
-        setIsCameraOpen(false);
+      alert("Camera access denied. Please check site permissions.");
+      setIsCameraOpen(false);
     }
   };
 
-  const capturePhoto = () => {
+  const toggleCamera = (e) => {
+    e.stopPropagation();
+    const newMode = facingMode === "user" ? "environment" : "user";
+    setFacingMode(newMode);
+    startCamera(newMode);
+  };
+
+  const capturePhoto = (e) => {
+    e.stopPropagation();
     const context = canvasRef.current.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, 640, 480);
     canvasRef.current.toBlob((blob) => {
@@ -114,7 +128,7 @@ function ScanPage({ category, onBack, onSuccess }) {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
       stopCamera();
-    });
+    }, "image/jpeg");
   };
 
   const stopCamera = () => {
@@ -133,9 +147,10 @@ function ScanPage({ category, onBack, onSuccess }) {
     try {
       const response = await fetch("http://127.0.0.1:5000/analyze", { method: "POST", body: formData });
       const data = await response.json();
+      if (data.error) throw new Error(data.error);
       onSuccess(data);
     } catch (error) {
-      alert("Analysis failed. Please check backend connection.");
+      alert("Analysis failed: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -152,23 +167,32 @@ function ScanPage({ category, onBack, onSuccess }) {
               {preview ? (
                 <img src={preview} alt="Preview" style={styles.fullPreview} />
               ) : (
-                <FaCloudUploadAlt size={80} color={category.color} />
+                <div style={{pointerEvents: 'none'}}>
+                  <FaCloudUploadAlt size={80} color={category.color} />
+                  <p style={{color: '#64748b', marginTop: '10px'}}>Click to upload photo</p>
+                </div>
               )}
-              <input type="file" onChange={(e) => {
+              <input type="file" accept="image/*" onChange={(e) => {
                 if(e.target.files[0]) {
                     setSelectedFile(e.target.files[0]);
                     setPreview(URL.createObjectURL(e.target.files[0]));
                 }
               }} style={styles.fileInput} />
-              <div style={{marginTop: '20px'}}>
-                <button onClick={startCamera} style={styles.secondaryBtn}><FaCamera /> Use Camera</button>
+              
+              <div style={{marginTop: '20px', position: 'relative', zIndex: 10}}>
+                <button onClick={(e) => { e.stopPropagation(); startCamera(); }} style={styles.secondaryBtn}>
+                  <FaCamera /> Use Live Camera
+                </button>
               </div>
             </div>
           ) : (
             <div style={styles.cameraBox}>
-              <video ref={videoRef} autoPlay style={styles.videoStream} />
-              <button onClick={capturePhoto} style={styles.captureBtn}>Capture Label</button>
-              <button onClick={stopCamera} style={styles.cancelBtn}>Cancel</button>
+              <video ref={videoRef} autoPlay playsInline style={styles.videoStream} />
+              <div style={styles.cameraControls}>
+                <button onClick={capturePhoto} style={styles.captureBtn}>Capture Photo</button>
+                <button onClick={toggleCamera} style={styles.switchBtn}><FaSyncAlt /> Flip Camera</button>
+                <button onClick={stopCamera} style={styles.cancelBtn}>Close Camera</button>
+              </div>
             </div>
           )}
         </div>
@@ -178,7 +202,7 @@ function ScanPage({ category, onBack, onSuccess }) {
           disabled={!selectedFile || loading} 
           style={{...styles.mainDetectBtn, backgroundColor: selectedFile && !loading ? category.color : '#cbd5e0'}}
         >
-          {loading ? "🔬 AI Analysis in Progress..." : "Start Analysis"}
+          {loading ? "🔬 Analyzing Ingredients..." : "Start Analysis"}
         </button>
       </div>
     </div>
@@ -189,11 +213,10 @@ function ScanPage({ category, onBack, onSuccess }) {
 const ReportPage = ({ result, category, onBack }) => {
   if (!result) return null;
 
-  // Logic to determine colors based on the safety score
   const getRiskTheme = (score) => {
-    if (score >= 80) return { border: '#2ecc71', bg: '#dcfce7', text: '#15803d' }; // Green
-    if (score >= 50) return { border: '#f1c40f', bg: '#fef9c3', text: '#854d0e' }; // Yellow/Moderate
-    return { border: '#e74c3c', bg: '#fee2e2', text: '#b91c1c' }; // Red/High
+    if (score >= 80) return { border: '#2ecc71', bg: '#dcfce7', text: '#15803d' };
+    if (score >= 50) return { border: '#f1c40f', bg: '#fef9c3', text: '#854d0e' };
+    return { border: '#e74c3c', bg: '#fee2e2', text: '#b91c1c' };
   };
 
   const theme = getRiskTheme(result.safety_score);
@@ -202,7 +225,7 @@ const ReportPage = ({ result, category, onBack }) => {
     <div style={styles.fullReportContainer}>
       <div style={styles.reportHeader}>
         <button onClick={onBack} style={styles.backButton}><FaArrowLeft /> New Scan</button>
-        <h1 style={styles.laptopTitle}>Product Safety Report</h1>
+        <h1 style={styles.laptopTitle}>{category.title} Safety Report</h1>
       </div>
 
       <div style={styles.reportGrid}>
@@ -215,7 +238,7 @@ const ReportPage = ({ result, category, onBack }) => {
             </div>
           </div>
           <div style={styles.alertBox}>
-            <h3><FaExclamationTriangle color="#e11d48" /> Demographic Alert</h3>
+            <h3 style={{display: 'flex', alignItems: 'center', gap: '8px'}}><FaExclamationTriangle color="#e11d48" /> Demographic Alert</h3>
             <p><strong>Avoid if:</strong> {result.not_recommended_for.join(", ")}</p>
             <p style={styles.smallReason}>{result.demographic_reasons}</p>
           </div>
@@ -223,11 +246,14 @@ const ReportPage = ({ result, category, onBack }) => {
 
         <div style={styles.reportMain}>
           <div style={styles.ingredientSection}>
-            <h3><FaMicroscope /> Ingredient Deep-Dive</h3>
+            <h3 style={{display: 'flex', alignItems: 'center', gap: '8px'}}><FaMicroscope /> Ingredient Deep-Dive</h3>
             <div style={styles.riskGrid}>
               <div style={styles.riskColumn}>
                 <h4 style={{color: '#e11d48'}}>Flagged (High Risk)</h4>
-                {result.high_risk_ingredients.map(i => <div key={i} style={styles.ingTagRed}>{i}</div>)}
+                {result.high_risk_ingredients.length > 0 ? 
+                  result.high_risk_ingredients.map(i => <div key={i} style={styles.ingTagRed}>{i}</div>) : 
+                  <p style={{fontSize: '13px', color: '#94a3b8'}}>No harmful ingredients flagged.</p>
+                }
               </div>
               <div style={styles.riskColumn}>
                 <h4 style={{color: '#059669'}}>Safe / Low Risk</h4>
@@ -236,13 +262,15 @@ const ReportPage = ({ result, category, onBack }) => {
             </div>
           </div>
           <div style={styles.alternativesSection}>
-            <h3><FaCheckCircle color="#059669" /> Safer Alternatives</h3>
+            <h3 style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#166534'}}><FaCheckCircle /> Safer Alternatives</h3>
             <div style={styles.altGrid}>
               {result.safer_alternatives.map((alt, i) => (
                 <div key={i} style={styles.altCardFull}>
-                  <FaShieldAlt size={24} color="#059669" />
-                  <strong>{alt.product_name}</strong>
-                  <p style={{fontSize: '14px', color: '#64748b', marginTop: '5px'}}>{alt.why_better}</p>
+                  <FaShieldAlt size={20} color="#059669" />
+                  <div style={{marginTop: '10px'}}>
+                    <strong style={{fontSize: '15px'}}>{alt.product_name}</strong>
+                    <p style={{fontSize: '13px', color: '#64748b', marginTop: '4px'}}>{alt.why_better}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -260,12 +288,12 @@ const Dashboard = ({ onSelect }) => {
     { id: "cosmetics", title: "Cosmetics", icon: <FaLeaf />, color: "#2ecc71", desc: "Skincare & Makeup" },
     { id: "food", title: "Food", icon: <FaUtensils />, color: "#e67e22", desc: "Packaged Foods" },
     { id: "healthcare", title: "Healthcare", icon: <FaMedkit />, color: "#e74c3c", desc: "Supplements & Meds" },
-    { id: "processed", title: "Processed", icon: <FaBoxOpen />, color: "#3498db", desc: "Chemical Goods" },
+    { id: "processed", title: "Processed", icon: <FaBoxOpen />, color: "#3498db", desc: "Household Chemicals" },
   ];
 
   return (
     <div style={styles.dashboardWrapper}>
-      <h1 style={styles.heroText}>What are you scanning today?</h1>
+      <h1 style={styles.heroText}>Analyze what's inside.</h1>
       <div style={styles.laptopGrid}>
         {categories.map((cat) => (
           <div key={cat.id} style={styles.megaCard} onClick={() => onSelect(cat)}>
@@ -283,21 +311,26 @@ const HistoryPage = ({ history, onBack, onView, onClear }) => (
   <div style={styles.centerContainer}>
     <div style={styles.headerRow}>
       <button onClick={onBack} style={styles.backButton}><FaArrowLeft /> Back</button>
-      <button onClick={onClear} style={styles.clearBtn}><FaTrash /> Clear All</button>
+      {history.length > 0 && <button onClick={onClear} style={styles.clearBtn}><FaTrash /> Clear All</button>}
     </div>
-    <h1 style={styles.sectionTitle}>Recent Scans</h1>
+    <h1 style={styles.sectionTitle}>Scan History</h1>
     <div style={styles.historyList}>
-      {history.length === 0 && <p style={{textAlign: 'center', color: '#94a3b8'}}>No history found.</p>}
-      {history.map((item, index) => (
-        <div key={index} style={styles.historyItem} onClick={() => onView(item)}>
-          <div style={{...styles.statusDot, backgroundColor: item.score >= 80 ? '#2ecc71' : item.score >= 50 ? '#f1c40f' : '#e74c3c'}} />
-          <div style={{flex: 1}}>
-            <h4 style={{margin: 0}}>{item.categoryName} Analysis</h4>
-            <small>{item.date} • Score: {item.score}</small>
-          </div>
-          <FaFileAlt color="#cbd5e0" size={20} />
+      {history.length === 0 ? (
+        <div style={{textAlign: 'center', padding: '40px', backgroundColor: 'white', borderRadius: '20px'}}>
+          <p style={{color: '#94a3b8'}}>No history found yet. Start scanning products!</p>
         </div>
-      ))}
+      ) : (
+        history.map((item, index) => (
+          <div key={index} style={styles.historyItem} onClick={() => onView(item)}>
+            <div style={{...styles.statusDot, backgroundColor: item.score >= 80 ? '#2ecc71' : item.score >= 50 ? '#f1c40f' : '#e74c3c'}} />
+            <div style={{flex: 1}}>
+              <h4 style={{margin: 0}}>{item.categoryName}</h4>
+              <small style={{color: '#64748b'}}>{item.date} • Safety Score: {item.score}</small>
+            </div>
+            <FaFileAlt color="#cbd5e0" size={20} />
+          </div>
+        ))
+      )}
     </div>
   </div>
 );
@@ -310,45 +343,48 @@ const styles = {
   navHistoryBtn: { padding: '8px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' },
   mainContent: { padding: '40px 80px' },
   centerContainer: { maxWidth: '800px', margin: '0 auto' },
-  heroText: { fontSize: '36px', textAlign: 'center', marginBottom: '40px', fontWeight: '800' },
-  laptopGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' },
-  megaCard: { backgroundColor: 'white', padding: '40px 20px', borderRadius: '24px', textAlign: 'center', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-  megaIcon: { width: '70px', height: '70px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '30px', margin: '0 auto 20px' },
-  scanCard: { backgroundColor: 'white', padding: '40px', borderRadius: '24px', textAlign: 'center', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' },
+  heroText: { fontSize: '42px', textAlign: 'center', marginBottom: '50px', fontWeight: '800', color: '#0f172a' },
+  laptopGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' },
+  megaCard: { backgroundColor: 'white', padding: '40px 20px', borderRadius: '28px', textAlign: 'center', cursor: 'pointer', transition: 'transform 0.2s ease', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid transparent' },
+  megaIcon: { width: '75px', height: '75px', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '32px', margin: '0 auto 24px' },
+  scanCard: { backgroundColor: 'white', padding: '40px', borderRadius: '28px', textAlign: 'center', boxShadow: '0 15px 30px -5px rgba(0,0,0,0.05)' },
   uploadSection: { margin: '20px 0' },
-  dropZone: { border: '2px dashed #cbd5e0', padding: '40px', borderRadius: '20px', backgroundColor: '#f8fafc', position: 'relative' },
-  fullPreview: { maxWidth: '100%', maxHeight: '250px', borderRadius: '12px', marginBottom: '15px' },
-  cameraBox: { backgroundColor: '#000', borderRadius: '20px', overflow: 'hidden', padding: '10px' },
-  videoStream: { width: '100%', borderRadius: '12px' },
-  captureBtn: { width: '100%', padding: '12px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '10px', marginTop: '10px', fontWeight: 'bold', cursor: 'pointer' },
-  cancelBtn: { background: 'none', color: 'white', border: 'none', marginTop: '10px', cursor: 'pointer', opacity: 0.8 },
-  mainDetectBtn: { width: '100%', padding: '18px', borderRadius: '14px', border: 'none', color: 'white', fontSize: '18px', fontWeight: '700', cursor: 'pointer' },
-  secondaryBtn: { padding: '10px 20px', borderRadius: '10px', border: '1px solid #cbd5e0', background: 'white', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 auto' },
+  dropZone: { border: '2px dashed #cbd5e0', padding: '50px 30px', borderRadius: '24px', backgroundColor: '#f8fafc', position: 'relative' },
+  fullPreview: { maxWidth: '100%', maxHeight: '300px', borderRadius: '16px', marginBottom: '15px', objectFit: 'contain' },
+  cameraBox: { backgroundColor: '#000', borderRadius: '24px', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
+  videoStream: { width: '100%', height: 'auto', backgroundColor: '#000' },
+  cameraControls: { display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px', backgroundColor: '#0f172a' },
+  captureBtn: { width: '100%', padding: '16px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' },
+  switchBtn: { width: '100%', padding: '12px', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+  cancelBtn: { background: 'none', color: 'rgba(255,255,255,0.6)', border: 'none', padding: '5px', cursor: 'pointer', fontSize: '14px' },
+  mainDetectBtn: { width: '100%', padding: '20px', borderRadius: '16px', border: 'none', color: 'white', fontSize: '18px', fontWeight: '700', cursor: 'pointer', transition: 'opacity 0.2s' },
+  secondaryBtn: { padding: '12px 24px', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px', margin: '0 auto', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' },
   fullReportContainer: { maxWidth: '1100px', margin: '0 auto' },
   reportHeader: { display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' },
-  laptopTitle: { fontSize: '28px', fontWeight: '800' },
-  reportGrid: { display: 'grid', gridTemplateColumns: '350px 1fr', gap: '30px' },
-  reportSide: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  scoreCardLarge: { backgroundColor: 'white', padding: '40px', borderRadius: '24px', textAlign: 'center', border: '6px solid', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' },
-  hugeScore: { fontSize: '80px', fontWeight: '900', display: 'block', lineHeight: 1 },
-  riskBadge: { display: 'inline-block', padding: '6px 16px', borderRadius: '20px', fontWeight: 'bold', marginTop: '15px', fontSize: '14px' },
-  alertBox: { backgroundColor: '#fff1f2', padding: '25px', borderRadius: '20px', border: '1px solid #fecdd3' },
-  smallReason: { fontSize: '13px', color: '#991b1b', marginTop: '8px', fontStyle: 'italic' },
-  reportMain: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  ingredientSection: { backgroundColor: 'white', padding: '30px', borderRadius: '24px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' },
-  riskGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '15px' },
-  ingTagRed: { padding: '10px', backgroundColor: '#fef2f2', color: '#991b1b', borderRadius: '10px', marginBottom: '8px', borderLeft: '4px solid #ef4444', fontSize: '14px' },
-  ingTagGreen: { padding: '10px', backgroundColor: '#f0fdf4', color: '#166534', borderRadius: '10px', marginBottom: '8px', borderLeft: '4px solid #22c55e', fontSize: '14px' },
-  alternativesSection: { backgroundColor: '#f0fdf4', padding: '30px', borderRadius: '24px', border: '1px solid #bbf7d0' },
-  altGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '15px' },
-  altCardFull: { backgroundColor: 'white', padding: '20px', borderRadius: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.03)' },
-  backButton: { background: 'none', border: 'none', color: '#64748b', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' },
-  historyItem: { backgroundColor: 'white', padding: '15px', borderRadius: '16px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer', border: '1px solid #e2e8f0' },
-  statusDot: { width: '10px', height: '10px', borderRadius: '50%' },
-  headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
-  clearBtn: { border: 'none', background: 'none', color: '#e11d48', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' },
-  fileInput: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' },
-  sectionTitle: { fontSize: '24px', fontWeight: '800', marginBottom: '20px' }
+  laptopTitle: { fontSize: '32px', fontWeight: '800' },
+  reportGrid: { display: 'grid', gridTemplateColumns: '360px 1fr', gap: '32px' },
+  reportSide: { display: 'flex', flexDirection: 'column', gap: '24px' },
+  scoreCardLarge: { backgroundColor: 'white', padding: '50px 30px', borderRadius: '28px', textAlign: 'center', border: '8px solid', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' },
+  hugeScore: { fontSize: '90px', fontWeight: '900', display: 'block', lineHeight: 1 },
+  riskBadge: { display: 'inline-block', padding: '8px 20px', borderRadius: '24px', fontWeight: 'bold', marginTop: '20px', fontSize: '15px' },
+  alertBox: { backgroundColor: '#fff1f2', padding: '30px', borderRadius: '28px', border: '1px solid #fecdd3' },
+  smallReason: { fontSize: '14px', color: '#991b1b', marginTop: '10px', fontStyle: 'italic', lineHeight: '1.5' },
+  reportMain: { display: 'flex', flexDirection: 'column', gap: '24px' },
+  ingredientSection: { backgroundColor: 'white', padding: '35px', borderRadius: '28px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' },
+  riskGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: '20px' },
+  riskColumn: { display: 'flex', flexDirection: 'column', gap: '10px' },
+  ingTagRed: { padding: '12px 16px', backgroundColor: '#fef2f2', color: '#991b1b', borderRadius: '12px', borderLeft: '5px solid #ef4444', fontSize: '14px', fontWeight: '500' },
+  ingTagGreen: { padding: '12px 16px', backgroundColor: '#f0fdf4', color: '#166534', borderRadius: '12px', borderLeft: '5px solid #22c55e', fontSize: '14px', fontWeight: '500' },
+  alternativesSection: { backgroundColor: '#f0fdf4', padding: '35px', borderRadius: '28px', border: '1px solid #bbf7d0' },
+  altGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px' },
+  altCardFull: { backgroundColor: 'white', padding: '24px', borderRadius: '20px', display: 'flex', alignItems: 'flex-start', gap: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  backButton: { background: 'none', border: 'none', color: '#64748b', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px' },
+  historyItem: { backgroundColor: 'white', padding: '20px', borderRadius: '20px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '20px', cursor: 'pointer', border: '1px solid #e2e8f0', transition: 'border-color 0.2s' },
+  statusDot: { width: '12px', height: '12px', borderRadius: '50%' },
+  headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' },
+  clearBtn: { border: 'none', background: 'none', color: '#e11d48', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' },
+  fileInput: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', zIndex: 1 },
+  sectionTitle: { fontSize: '28px', fontWeight: '800', marginBottom: '25px' }
 };
 
 export default App;
