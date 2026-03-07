@@ -7,9 +7,9 @@ from dotenv import load_dotenv
 from google import genai 
 from google.genai import types
 
-# Import the modular chatbot function
-# Ensure your file is named Chatbot.py (Case Sensitive)
+# Import the modular functions
 from Chatbot import handle_chat_query
+from shopping_service import get_product_prices  # <--- Imported your new service
 
 # 1. Setup & Config
 load_dotenv()
@@ -42,10 +42,8 @@ def validate_risk_level(score):
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    # 1. Get the category sent from the frontend
     category_type = request.form.get("category", "general")
     
-    # 2. Get the file
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
     
@@ -54,7 +52,6 @@ def analyze():
     file.save(filepath)
 
     try:
-        # Strict instructions to prevent "Always Moderate" bias
         threshold_rules = """
         STRICT RULES FOR SCORING:
         - You MUST use the full range of 0-100.
@@ -114,6 +111,15 @@ def analyze():
         score = analysis_data.get("safety_score", 50)
         analysis_data["overall_product_risk"] = validate_risk_level(score)
 
+        # --- NEW: INTEGRATE PRICE COMPARISON ---
+        # We loop through each alternative suggested by the AI and fetch prices for it
+        if "safer_alternatives" in analysis_data:
+            for alt in analysis_data["safer_alternatives"]:
+                product_name = alt.get("product_name")
+                if product_name:
+                    # Call the modular function from shopping_service.py
+                    alt["market_data"] = get_product_prices(product_name)
+
         return jsonify(analysis_data)
 
     except Exception as e:
@@ -121,7 +127,6 @@ def analyze():
         return jsonify({"error": "Analysis failed", "details": str(e)}), 500
     
     finally:
-        # Cleanup uploaded file
         if os.path.exists(filepath):
             os.remove(filepath)
 
@@ -131,7 +136,6 @@ def chat():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    # Pass logic to modular Chatbot.py
     result = handle_chat_query(
         client, 
         data.get("query"), 

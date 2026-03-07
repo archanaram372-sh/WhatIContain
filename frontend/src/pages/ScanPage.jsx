@@ -5,8 +5,9 @@ import {
   FaCheckCircle, FaCamera, FaMicroscope, FaShieldAlt, FaInfoCircle, FaFileAlt, FaSyncAlt
 } from "react-icons/fa";
 
-// IMPORTANT: Ensure ChatBot.jsx exists in the same directory
+// IMPORTANT: Ensure these components exist in your src folder
 import ChatBot from "./ChatBot"; 
+import PriceCard from "./PriceCard"; 
 
 function App() {
   const [view, setView] = useState("dashboard"); 
@@ -261,15 +262,20 @@ const ReportPage = ({ result, category, onBack }) => {
               </div>
             </div>
           </div>
+
           <div style={styles.alternativesSection}>
             <h3 style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#166534'}}><FaCheckCircle /> Safer Alternatives</h3>
             <div style={styles.altGrid}>
               {result.safer_alternatives.map((alt, i) => (
                 <div key={i} style={styles.altCardFull}>
                   <FaShieldAlt size={20} color="#059669" />
-                  <div style={{marginTop: '10px'}}>
+                  <div style={{marginTop: '10px', width: '100%'}}>
                     <strong style={{fontSize: '15px'}}>{alt.product_name}</strong>
                     <p style={{fontSize: '13px', color: '#64748b', marginTop: '4px'}}>{alt.why_better}</p>
+                    
+                    {/* PriceCard Integration */}
+                    <PriceCard marketData={alt.market_data} />
+                    
                   </div>
                 </div>
               ))}
